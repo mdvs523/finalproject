@@ -1,0 +1,85 @@
+SELECT * FROM all_products_raw;
+
+CREATE TABLE SUBTITLE(
+    subtitle_ID int PRIMARY KEY AUTOINCREMENT,
+    subtitle varchar(300));
+
+INSERT INTO SUBTITLE(subtitle)
+SELECT DISTINCT subtitle FROM all_products_raw;
+
+CREATE TABLE CATEGORY(
+    category_ID int PRIMARY KEY AUTOINCREMENT,
+    category varchar(300));
+
+INSERT INTO CATEGORY(category)
+SELECT DISTINCT category FROM all_products_raw;
+
+CREATE TABLE TYPE(
+    type_ID int PRIMARY KEY AUTOINCREMENT,
+    type varchar(300));
+
+INSERT INTO TYPE(type)
+SELECT DISTINCT type FROM all_products_raw;
+
+SELECT * FROM subtitle;
+SELECT * FROM category;
+SELECT * FROM type;
+
+CREATE TABLE PRODUCTS(
+    product_ID varchar(300) PRIMARY KEY,
+    title varchar(300),
+    subtitle_id int,
+    category_id int,
+    type_id int,
+    fullprice float,
+    currentprice float,
+    rating float);
+
+INSERT INTO PRODUCTS(product_ID, title, fullprice, currentprice, rating)
+SELECT UID, title, fullprice, currentprice, rating
+FROM all_products_raw;
+
+CREATE TABLE temp1 AS
+SELECT subtitle.subtitle_id,subtitle.subtitle,all_products_raw.UID
+FROM subtitle
+JOIN all_products_raw
+ON subtitle.subtitle=all_products_raw.subtitle;
+
+UPDATE products
+SET products.subtitle_id=temp1.subtitle_id
+FROM temp1
+WHERE PRODUCTS.product_ID=temp1.UID;
+
+DROP TABLE temp1;
+
+CREATE TABLE temp2 AS
+SELECT category.category_id,category.category,all_products_raw.UID
+FROM category
+JOIN all_products_raw
+ON category.category=all_products_raw.category;
+
+UPDATE products
+SET products.category_id=temp2.category_id
+FROM temp2
+WHERE PRODUCTS.product_ID=temp2.UID;
+
+DROP TABLE temp2;
+
+CREATE TABLE temp3 AS
+SELECT type.type_id,type.type,all_products_raw.UID
+FROM type
+JOIN all_products_raw
+ON type.type=all_products_raw.type;
+
+UPDATE products
+SET products.type_id=temp3.type_id
+FROM temp3
+WHERE PRODUCTS.product_ID=temp3.UID;
+
+DROP TABLE temp3;
+
+SELECT * FROM all_sales_raw;
+
+CREATE TABLE SALES AS
+SELECT ticket_ID, UID, currency, sales, quantity, date
+FROM all_sales_raw;

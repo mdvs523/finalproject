@@ -1,0 +1,58 @@
+//Query the top 5 sales by product
+
+SELECT sales.UID, products.title, SUM(sales) FROM SALES
+JOIN products
+ON sales.UID=products.product_id
+GROUP BY sales.UID, products.title
+ORDER BY SUM(sales) DESC
+LIMIT 5;
+
+
+//Query the top 5 sales by category agrupation
+
+SELECT category.category, SUM(sales) FROM SALES
+JOIN products
+ON sales.UID=products.product_id
+JOIN category
+ON products.category_id=category.category_id
+GROUP BY category.category
+ORDER BY SUM(sales) DESC
+LIMIT 5;
+
+//Query the least 5 sales by category agrupation
+
+SELECT category.category, SUM(sales) FROM SALES
+JOIN products
+ON sales.UID=products.product_id
+JOIN category
+ON products.category_id=category.category_id
+GROUP BY category.category
+ORDER BY SUM(sales) ASC
+LIMIT 5;
+
+//Query the top 5 sales by title and subtitle agrupation
+
+SELECT products.title, subtitle.subtitle, SUM(sales) FROM SALES
+JOIN products
+ON sales.UID=products.product_id
+JOIN subtitle
+ON products.subtitle_id=subtitle.subtitle_id
+GROUP BY products.title, subtitle.subtitle
+ORDER BY SUM(sales) DESC
+LIMIT 5;
+
+
+//Query the top 3 products that has greatest sales by category
+
+SELECT * FROM(
+    SELECT
+    products.title,
+    category.category,
+    SUM(sales),
+    RANK() OVER (PARTITION BY category.category ORDER BY SUM(sales) DESC) AS ranking FROM SALES
+    JOIN products
+    ON sales.UID=products.product_id
+    JOIN category
+    ON products.category_id=category.category_id
+    GROUP BY products.title, category.category)
+WHERE ranking<=3;
